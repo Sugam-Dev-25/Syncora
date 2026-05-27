@@ -18,7 +18,7 @@ const Navbar = () => {
 
   return (
 
-    <div className="bg-white/80 backdrop-blur-xl border-b border-slate-200 px-8 py-4 flex items-center justify-between shadow-sm">
+    <div className="bg-white border-b border-slate-200 px-8 py-4 flex items-center justify-between shadow-sm">
 
       {/* LOGO */}
 
