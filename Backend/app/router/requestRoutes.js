@@ -9,3 +9,4 @@ router.post("/reject-request/:id", authMiddleware, requestController.rejectReque
 router.get("/get-requests", authMiddleware, requestController.getRequests);
 
 module.exports = router;
+

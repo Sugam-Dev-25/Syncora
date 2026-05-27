@@ -18,11 +18,19 @@ class AuthController {
                 return res.status(400).json({ message: "User already exists" });
             }
 
-            let imageUrl = "";
-            if (req.file) {
-                const result = await cloudinary.uploader.upload(req.file.path);
-                imageUrl = result.secure_url;
-            }
+let imageUrl = "";
+
+if (req.file) {
+
+    const base64 = `data:${req.file.mimetype};base64,${req.file.buffer.toString("base64")}`;
+
+    const result =
+        await cloudinary.uploader.upload(base64, {
+            folder: "syncora-users",
+        });
+
+    imageUrl = result.secure_url;
+}
 
            const hashedPassword = await bcrypt.hash(password, 10);
 

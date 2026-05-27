@@ -4,42 +4,95 @@ const Conversation = require("../models/Conversation");
 
 class RequestController {
   static async sendRequest(req, res) {
-    try {
-      const { receiverId } = req.body;
 
-      if (receiverId === req.user._id.toString()) {
-        return res.status(400).json({
-          message: "You cannot send a request to yourself",
-        });
-      }
+  try {
 
-      const alreadySentRequest = await Request.findOne({
-        sender: req.user._id,
-        receiver: receiverId,
+    const { receiverId } =
+    req.body;
+
+    if (
+      receiverId ===
+      req.user._id.toString()
+    ) {
+
+      return res.status(400).json({
+        message:
+        "You cannot send a request to yourself",
       });
 
-      if (alreadySentRequest) {
-        return res.status(400).json({
-          message: "You have already sent a request to this user",
-        });
-      }
-
-      const request = await Request.create({
-        sender: req.user._id,
-        receiver: receiverId,
-      });
-
-      res.status(200).json({
-        success: true,
-        request,
-      });
-    } catch (error) {
-      res.status(400).json({
-        success: false,
-        error: error.message,
-      });
     }
+
+    const receiverUser =
+    await User.findById(receiverId);
+
+    // ALREADY FRIEND
+
+    if(
+      receiverUser.friends.includes(
+        req.user._id
+      )
+    ){
+
+      return res.status(400).json({
+        message: "Already friends",
+      });
+
+    }
+
+    // PENDING REQUEST
+
+    const alreadySentRequest =
+    await Request.findOne({
+
+      sender: req.user._id,
+
+      receiver: receiverId,
+
+      status: "pending",
+
+    });
+
+    if (alreadySentRequest) {
+
+      return res.status(400).json({
+
+        message:
+        "Request already sent",
+
+      });
+
+    }
+
+    const request =
+    await Request.create({
+
+      sender: req.user._id,
+
+      receiver: receiverId,
+
+    });
+
+    res.status(200).json({
+
+      success: true,
+
+      request,
+
+    });
+
+  } catch (error) {
+
+    res.status(400).json({
+
+      success: false,
+
+      error: error.message,
+
+    });
+
   }
+
+}
 
   static async acceptRequest(req, res) {
     try {
@@ -64,7 +117,7 @@ class RequestController {
       });
 
       const conversation = await Conversation.create({
-        members: [request.sender, request.receiver],
+        member: [request.sender, request.receiver],
       });
 
       res.status(200).json({
