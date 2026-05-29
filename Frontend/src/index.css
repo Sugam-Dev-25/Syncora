@@ -5,8 +5,7 @@
 }
 
 body{
-  background: #0f172a;
-  color: white;
+  color: rgb(0, 0, 0);
 }
 
 ::-webkit-scrollbar{

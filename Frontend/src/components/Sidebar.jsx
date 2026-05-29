@@ -8,13 +8,13 @@ const Sidebar = () => {
 
   return (
 
-    <div className="w-[350px] overflow-y-auto border-r border-slate-200 bg-white shadow-xl">
+    <div className="w-[300px] overflow-y-auto border-r border-slate-200 bg-white shadow-xl">
 
       <div className="min-h-screen p-4">
 
-        <SearchUsers />
+        {/* <SearchUsers /> */}
 
-        <Requests />
+        {/* <Requests /> */}
 
         <ConversationList />
 

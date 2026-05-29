@@ -15,7 +15,7 @@ class ConversationController {
       })
       .populate(
         "member",
-        "name profileImage online"
+        "name email profileImage online"
       );
 
       const users =

@@ -16,12 +16,16 @@ import {
 import {
   Search,
   UserPlus,
+  Check,
 } from "lucide-react";
 
 const SearchUsers = () => {
 
   const [search, setSearch] =
   useState("");
+
+  const [sentRequestIds, setSentRequestIds] =
+  useState([]);
 
   const dispatch = useDispatch();
 
@@ -30,23 +34,47 @@ const SearchUsers = () => {
 
   const handleSearch = () => {
 
-    dispatch(searchUsers(search));
+    if(!search.trim()) return;
+
+    dispatch(
+      searchUsers(search)
+    );
+
+  };
+
+  const handleSendRequest =
+  async (userId)=>{
+
+    const result =
+    await dispatch(
+      sendRequest(userId)
+    );
+
+    if(result.payload?.success){
+
+      setSentRequestIds((prev)=>
+        [...prev, userId]
+      );
+
+    }
 
   };
 
   return (
 
-    <div className="bg-white rounded-3xl p-4 shadow-sm border border-slate-200">
+    <div className="relative w-[520px] xl:w-[700px]">
 
       {/* SEARCH BAR */}
 
-      <div className="flex items-center gap-3">
+      <div className="flex items-center gap-4">
+
+        {/* INPUT */}
 
         <div className="flex-1 relative">
 
           <Search
-            size={18}
-            className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400"
+            size={20}
+            className="absolute left-5 top-1/2 -translate-y-1/2 text-slate-400"
           />
 
           <input
@@ -54,89 +82,144 @@ const SearchUsers = () => {
             placeholder="Search contacts..."
             value={search}
             onChange={(e)=>
-              setSearch(e.target.value)
+              setSearch(
+                e.target.value
+              )
             }
-            className="w-full pl-11 pr-4 py-3 rounded-full bg-slate-100 outline-none border border-slate-200 focus:border-blue-400"
+            onKeyDown={(e)=>{
+
+              if(e.key === "Enter"){
+
+                handleSearch();
+
+              }
+
+            }}
+            className="w-full h-12 pl-14 pr-5 rounded-full bg-slate-100 border border-slate-200 outline-none focus:border-violet-400 focus:ring-4 focus:ring-violet-100 transition text-slate-700 placeholder:text-slate-400 text-lg"
           />
 
         </div>
 
+        {/* SEARCH BUTTON */}
+
         <button
           onClick={handleSearch}
-          className="w-12 h-12 rounded-full bg-gradient-to-r from-blue-600 to-violet-600 text-white flex items-center justify-center shadow-lg"
+          className="w-12 h-12 rounded-full bg-gradient-to-r from-blue-600 to-violet-600 text-white flex items-center justify-center shadow-lg hover:scale-105 transition duration-300 shrink-0"
         >
 
-          <Search size={20} />
+          <Search size={22} />
 
         </button>
 
       </div>
 
-      {/* SEARCH RESULTS */}
+      {/* RESULTS */}
 
       {users.length > 0 && (
 
-        <div className="mt-6 space-y-3">
+        <div className="absolute top-[85px] left-0 w-full bg-white rounded-[32px] shadow-2xl border border-slate-100 p-4 z-[999]">
 
-          <h2 className="text-sm font-bold text-slate-500 uppercase">
+          {/* HEADER */}
 
-            Search Results
+          <div className="flex items-center justify-between mb-5 px-2">
 
-          </h2>
+            <h2 className="text-xs font-black tracking-[3px] text-slate-400 uppercase">
 
-          {users.map((user)=>(
+              Search Results
 
-            <div
-              key={user._id}
-              className="flex items-center justify-between p-3 rounded-2xl hover:bg-slate-100 transition"
-            >
+            </h2>
 
-              <div className="flex items-center gap-3">
+            <span className="text-xs font-semibold text-violet-600 bg-violet-50 px-4 py-1.5 rounded-full">
 
-                <div className="relative">
+              {users.length} Found
 
-                  <img
-                    src={user.profileImage}
-                    alt=""
-                    className="w-14 h-14 rounded-full object-cover"
-                  />
+            </span>
 
-                  <div className="w-3 h-3 bg-green-500 rounded-full absolute bottom-0 right-0 border-2 border-white"></div>
+          </div>
+
+          {/* USER LIST */}
+
+          <div className="space-y-2 max-h-[420px] overflow-y-auto pr-1">
+
+            {users.map((user)=>(
+
+              <div
+                key={user._id}
+                className="group flex items-center justify-between p-4 rounded-3xl hover:bg-slate-100 transition duration-300"
+              >
+
+                {/* LEFT */}
+
+                <div className="flex items-center gap-4">
+
+                  {/* IMAGE */}
+
+                  <div className="relative">
+
+                    <img
+                      src={user.profileImage}
+                      alt=""
+                      className="w-16 h-16 rounded-full object-cover border-2 border-white shadow-md"
+                    />
+
+                    <span className="absolute bottom-0 right-0 w-4 h-4 rounded-full bg-green-500 border-2 border-white"></span>
+
+                  </div>
+
+                  {/* INFO */}
+
+                  <div>
+
+                    <h2 className="font-bold text-slate-800 text-[16px] leading-none">
+
+                      {user.name}
+
+                    </h2>
+
+                    <p className="text-sm text-slate-500 mt-2 truncate w-[240px]">
+
+                      {user.email}
+
+                    </p>
+
+                  </div>
 
                 </div>
 
-                <div>
+                {/* RIGHT */}
 
-                  <h2 className="font-bold text-slate-800">
+                {sentRequestIds.includes(
+                  user._id
+                ) ? (
 
-                    {user.name}
+                  <div className="w-12 h-12 rounded-full bg-green-500 text-white flex items-center justify-center shadow-lg">
 
-                  </h2>
+                    <Check size={20} />
 
-                  <p className="text-sm text-slate-500 truncate w-[120px]">
+                  </div>
 
-                    {user.email}
+                ) : (
 
-                  </p>
+                  <button
+                    onClick={()=>
+                      handleSendRequest(
+                        user._id
+                      )
+                    }
+                    className="w-12 h-12 rounded-full bg-gradient-to-r from-blue-600 to-violet-600 text-white flex items-center justify-center shadow-lg hover:scale-110 transition duration-300"
+                  >
 
-                </div>
+                    <UserPlus size={18} />
+
+                  </button>
+
+                )}
 
               </div>
 
-              <button
-                onClick={()=>
-                  dispatch(sendRequest(user._id))
-                }
-                className="w-10 h-10 rounded-full bg-gradient-to-r from-blue-600 to-violet-600 text-white flex items-center justify-center"
-              >
+            ))}
 
-                <UserPlus size={18} />
-
-              </button>
-
-            </div>
-
-          ))}
+          </div>
 
         </div>
 

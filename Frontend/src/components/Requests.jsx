@@ -28,9 +28,9 @@ const Requests = () => {
 
   return (
 
-    <div className="mt-6">
+    <div className="mt-6  px-6">
 
-      <h2 className="text-sm font-bold text-slate-500 uppercase mb-4 px-2">
+      <h2 className="text-sm font-bold  uppercase mb-4 px-4">
 
         Friend Requests
 
@@ -82,7 +82,7 @@ const Requests = () => {
                 onClick={()=>
                   dispatch(acceptRequest(req._id))
                 }
-                className="px-4 py-2 rounded-xl bg-gradient-to-r from-blue-600 to-violet-600 text-white text-sm font-semibold"
+                className="px-4 py-2 rounded-full bg-gradient-to-r from-blue-600 to-violet-600 text-white text-sm font-semibold"
               >
 
                 Accept
@@ -93,7 +93,7 @@ const Requests = () => {
                 onClick={()=>
                   dispatch(rejectRequest(req._id))
                 }
-                className="px-4 py-2 rounded-xl bg-slate-200 text-slate-700 text-sm font-semibold"
+                className="px-4 py-2 rounded-full bg-slate-200 text-slate-700 text-sm font-semibold"
               >
 
                 Reject
