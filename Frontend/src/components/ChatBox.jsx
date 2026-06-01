@@ -6,9 +6,11 @@ import {
   getMessages,
   sendMessage,
   addMessage,
+  setOnlineUsers,
+  setUnreadMessage,
 } from "../features/chat/chatSlice";
 
-import { Send, Paperclip } from "lucide-react";
+import { Send, Paperclip, Phone, Video } from "lucide-react";
 
 import socket from "../socket/socket";
 
@@ -17,7 +19,9 @@ const ChatBox = () => {
 
   const bottomRef = useRef();
 
-  const { selectedUser, messages } = useSelector((state) => state.chat);
+  const { selectedUser, messages, onlineUsers } = useSelector(
+    (state) => state.chat,
+  );
 
   const { user } = useSelector((state) => state.auth);
 
@@ -42,12 +46,31 @@ const ChatBox = () => {
 
     socket.on("receiveMessage", (message) => {
       dispatch(addMessage(message));
+
+      // REAL SENDER ID
+
+      const senderId =
+        typeof message.sender === "object"
+          ? message.sender._id
+          : message.sender;
+
+      // IF CHAT NOT OPEN
+
+      if (!selectedUser || selectedUser._id !== senderId) {
+        dispatch(setUnreadMessage(senderId));
+      }
+    });
+
+    socket.on("onlineUsers", (users) => {
+      dispatch(setOnlineUsers(users));
     });
 
     return () => {
       socket.off("receiveMessage");
+
+      socket.off("onlineUsers");
     };
-  }, [user, dispatch]);
+  }, [user, dispatch, selectedUser]);
 
   // AUTO SCROLL
 
@@ -111,19 +134,49 @@ const ChatBox = () => {
     <div className="flex-1 flex flex-col bg-gradient-to-br from-blue-50 via-white to-violet-100">
       {/* HEADER */}
 
-      <div className="bg-white/80 backdrop-blur-lg border-b border-slate-200 p-4 flex items-center gap-4 shadow-sm">
-        <img
-          src={selectedUser.profileImage}
-          alt=""
-          className="w-14 h-14 rounded-full object-cover border-2 border-violet-300"
-        />
+      <div className="bg-white/80 backdrop-blur-lg border-b border-slate-200 px-6 py-4 flex items-center justify-between shadow-sm">
+        {/* LEFT */}
 
-        <div>
-          <h2 className="font-bold text-xl text-slate-800">
-            {selectedUser.name}
-          </h2>
+        <div className="flex items-center gap-4">
+          <img
+            src={selectedUser.profileImage}
+            alt=""
+            className="w-14 h-14 rounded-full object-cover border-2 border-violet-300"
+          />
 
-          <p className="text-sm text-green-500 font-medium">Online</p>
+          <div>
+            <h2 className="font-bold text-xl text-slate-800">
+              {selectedUser.name}
+            </h2>
+
+            {/* DYNAMIC STATUS */}
+
+            <p
+              className={`text-sm font-medium ${
+                onlineUsers?.includes(selectedUser?._id)
+                  ? "text-green-500"
+                  : "text-slate-400"
+              }`}
+            >
+              {onlineUsers?.includes(selectedUser?._id) ? "Online" : "Offline"}
+            </p>
+          </div>
+        </div>
+
+        {/* RIGHT */}
+
+        <div className="flex items-center gap-3">
+          {/* VIDEO CALL */}
+
+          <button className="w-11 h-11 rounded-full bg-gradient-to-r from-blue-600 to-violet-600 text-white flex items-center justify-center shadow-lg hover:scale-105 transition duration-300">
+            <Video size={20} />
+          </button>
+
+          {/* AUDIO CALL */}
+
+          <button className="w-11 h-11 rounded-full bg-gradient-to-r from-blue-600 to-violet-600 text-white flex items-center justify-center shadow-lg hover:scale-105 transition duration-300">
+            <Phone size={20} />
+          </button>
         </div>
       </div>
 
@@ -212,35 +265,32 @@ const ChatBox = () => {
 
       {/* INPUT */}
 
-      <div className="bg-white/80 backdrop-blur-lg border-t border-slate-200 p-4 flex gap-3 items-center">
+      <div className="bg-white/80 backdrop-blur-lg border-t border-slate-200 p-4 flex gap-3 items-center shadow-sm ">
+        <input
+          type="text"
+          placeholder="Type message..."
+          value={text}
+          onChange={(e) => setText(e.target.value)}
+          className="w-full p-3 rounded-full border border-slate-300 bg-slate-50 outline-none focus:ring-4 focus:ring-blue-200 focus:border-blue-500 transition placeholder:text-slate-400"
+        />
 
-  <input
-    type="text"
-    placeholder="Type message..."
-    value={text}
-    onChange={(e) => setText(e.target.value)}
-    className="w-full p-3 rounded-full border border-slate-300 bg-slate-50 outline-none focus:ring-4 focus:ring-blue-200 focus:border-blue-500 transition placeholder:text-slate-400"
-  />
+        <label className="w-13 h-12 rounded-full bg-white border border-slate-300 flex items-center justify-center cursor-pointer hover:bg-slate-100 transition shadow-sm">
+          <Paperclip size={20} className="text-slate-600" />
 
-  <label className="w-12 h-12 rounded-full bg-white border border-slate-300 flex items-center justify-center cursor-pointer hover:bg-slate-100 transition shadow-sm">
-    
-    <Paperclip size={20} className="text-slate-600" />
+          <input
+            type="file"
+            hidden
+            onChange={(e) => setFile(e.target.files[0])}
+          />
+        </label>
 
-    <input
-      type="file"
-      hidden
-      onChange={(e) => setFile(e.target.files[0])}
-    />
-  </label>
-
-  <button
-    onClick={handleSend}
-    className="w-12 h-12 rounded-full bg-gradient-to-r from-blue-600 to-violet-600 text-white shadow-lg hover:scale-105 transition duration-300 flex items-center justify-center"
-  >
-    <Send size={22} />
-  </button>
-
-</div>
+        <button
+          onClick={handleSend}
+          className="w-13 h-12 rounded-full bg-gradient-to-r from-blue-600 to-violet-600 text-white shadow-lg hover:scale-105 transition duration-300 flex items-center justify-center"
+        >
+          <Send size={20} />
+        </button>
+      </div>
     </div>
   );
 };

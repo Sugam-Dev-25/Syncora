@@ -1,3 +1,5 @@
+const User = require("../models/User");
+
 const onlineUsers = new Map();
 
 const socketHandler = (io) => {
@@ -16,11 +18,11 @@ const socketHandler = (io) => {
 
     socket.on("sendMessage", (data) => {
       try {
-        const { receiverId } = data;
+        const { receiver } = data;
 
         // RECEIVER SOCKET
 
-        const receiverSocketId = onlineUsers.get(receiverId);
+        const receiverSocketId = onlineUsers.get(receiver);
 
         // SEND TO RECEIVER
 
