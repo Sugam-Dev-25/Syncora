@@ -26,3 +26,15 @@ export const loginAPI = async (formData) => {
   return data;
 
 };
+
+export const logoutAPI = async () => {
+  const { data } = await API.post("/auth/logout");
+
+  return data;
+};
+
+export const getMeAPI = async () => {
+  const { data } = await API.get("/auth/me");
+
+  return data;
+};

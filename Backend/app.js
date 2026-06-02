@@ -2,6 +2,7 @@ const express = require("express");
 const path = require("path");
 const cors = require("cors");
 const http = require("http");
+const cookieParser = require("cookie-parser");
 
 
 require("dotenv").config();
@@ -24,10 +25,17 @@ const io = new Server(server, {
     }
 });
 
-app.use(cors());
+app.use(
+  cors({
+    origin: "http://localhost:5173",
+    credentials: true,
+  })
+);
 
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
+
+app.use(cookieParser());
 
 app.use(express.static(path.join(__dirname, "public")));
 
@@ -36,6 +44,7 @@ app.use("/api/users", require("./app/router/userRoutes"));
 app.use("/api/messages", require("./app/router/messageRoutes"));
 app.use("/api/requests", require("./app/router/requestRoutes"));
 app.use("/api/conversations", require("./app/router/conversationRoutes"));
+
 
 app.get("/", (req, res)=>{
 

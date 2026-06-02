@@ -2,7 +2,7 @@ import React, { useEffect } from "react";
 
 import { useDispatch, useSelector } from "react-redux";
 
-import { logout } from "../features/auth/authSlice";
+import { logoutUser } from "../features/auth/authSlice";
 
 import { getProfile } from "../features/user/userSlice";
 
@@ -95,7 +95,7 @@ const Navbar = () => {
         {/* LOGOUT */}
 
         <button
-          onClick={() => dispatch(logout())}
+          onClick={() => dispatch(logoutUser())}
           className="px-6 py-3 rounded-full bg-gradient-to-r from-red-500 to-pink-500 text-white font-semibold shadow-lg hover:scale-105 transition duration-300 flex items-center gap-2"
         >
           <LogOut size={18} />
