@@ -4,10 +4,11 @@ const cors = require("cors");
 const http = require("http");
 const cookieParser = require("cookie-parser");
 
-
 require("dotenv").config();
 
 const app = express();
+
+app.set("trust proxy", 1);
 
 const connectDB = require("./app/config/db");
 connectDB();
@@ -16,13 +17,16 @@ const socketHandler = require("./app/socket/socket");
 
 const server = http.createServer(app);
 
-const {Server} = require("socket.io");
+const { Server } = require("socket.io");
 
 const io = new Server(server, {
-    cors: {
-        origin: "*",
-        
-    }
+  cors: {
+    origin: [
+      "http://localhost:5173",
+      "https://syncora-iota.vercel.app",
+    ],
+    credentials: true,
+  },
 });
 
 app.use(
@@ -48,10 +52,8 @@ app.use("/api/messages", require("./app/router/messageRoutes"));
 app.use("/api/requests", require("./app/router/requestRoutes"));
 app.use("/api/conversations", require("./app/router/conversationRoutes"));
 
-
-app.get("/", (req, res)=>{
-
-    res.send("Server is running");
+app.get("/", (req, res) => {
+  res.send("Server is running");
 });
 
 socketHandler(io);
@@ -59,5 +61,5 @@ socketHandler(io);
 const port = process.env.PORT || 5000;
 
 server.listen(port, () => {
-    console.log(`Server is running on port ${port}`);
+  console.log(`Server is running on port ${port}`);
 });
