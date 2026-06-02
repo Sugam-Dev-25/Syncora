@@ -1,15 +1,15 @@
 import { Routes, Route } from "react-router-dom";
 
-import Register from "./Pages/Register";
-import Login from "./Pages/Login";
-import Profile from "./Pages/Profile";
-import Dashboard from "./Pages/Dashboard";
+import Register from "./pages/Register";
+import Login from "./pages/Login";
+import Profile from "./pages/Profile";
+import Dashboard from "./pages/Dashboard";
 
 import ProtectedRoute from "./routes/ProtectedRoute";
 
-import Requests from "./Components/Requests";
+import Requests from "./components/Requests";
 
-import Navbar from "./Components/Navbar";
+import Navbar from "./components/Navbar";
 
 import { useEffect } from "react";
 
