@@ -75,8 +75,8 @@ class AuthController {
 
       res.cookie("token", token, {
         httpOnly: true,
-        secure: false,
-        sameSite: "lax",
+        secure: true,
+        sameSite: "none",
         maxAge: 30 * 24 * 60 * 60 * 1000,
       });
 
@@ -123,9 +123,8 @@ class AuthController {
 
       res.cookie("token", token, {
         httpOnly: true,
-        secure: false,
-        sameSite: "lax",
-        credentials: true,
+        secure: true,
+        sameSite: "none",
         maxAge: 30 * 24 * 60 * 60 * 1000,
       });
 
@@ -152,7 +151,11 @@ class AuthController {
 
   static async logoutUser(req, res) {
     try {
-      res.clearCookie("token");
+      res.clearCookie("token", {
+        httpOnly: true,
+        secure: true,
+        sameSite: "none",
+      });
 
       res.status(200).json({
         success: true,
